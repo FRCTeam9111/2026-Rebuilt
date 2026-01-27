@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.CANFuelSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.DriveSubsystem; 
 
 public final class Autos {
   private final static DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -30,13 +30,12 @@ public final class Autos {
         ballSubsystem.launchCommand().withTimeout(9),
         // Stop running the launcher
         ballSubsystem.runOnce(() -> ballSubsystem.stop()));
-        
+
     /*
      * return Commands.run(
        () -> m_robotDrive.drive(1, 1, 0, true), driveSubsystem).withTimeout(0.25);
      * 
      */
-    
   }  
 }
 

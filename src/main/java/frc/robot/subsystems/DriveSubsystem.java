@@ -187,8 +187,10 @@ public class DriveSubsystem extends SubsystemBase {
 
 
   public Command driveForward(DriveSubsystem driveSubsystem, double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    return Commands.run(
-       () -> drive(xSpeed, ySpeed, rot, fieldRelative), driveSubsystem);
+
+    /* return Commands.run(
+       () -> drive(xSpeed, ySpeed, rot, fieldRelative), driveSubsystem);*/
+     return this.run(() -> drive(xSpeed, ySpeed, rot, fieldRelative));
   }
 }
 
