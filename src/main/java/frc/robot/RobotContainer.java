@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.FuelConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -38,6 +41,8 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+
+  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -85,7 +90,17 @@ public class RobotContainer {
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
 
-      // While the left bumper on operator controller is held, intake Fuel
+    /*Using CommandXboxController, the above code can be rewritten as:
+     * 
+     * While the right trigger on the operator controller is held, drive in an X
+     * driverController.rightTrigger()
+        .whileTrue(m_robotDrive.run((() -> m_robotDrive.setX())));
+
+        driverController.start()
+        .whileTrue(m_robotDrive.runOnce((() -> m_robotDrive.zeroHeading())));
+     */
+
+    // While the left bumper on operator controller is held, intake Fuel
     driverController.leftBumper()
         .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()));
     // While the right bumper on the operator controller is held, spin up for 1
@@ -98,6 +113,16 @@ public class RobotContainer {
     // the intake
     driverController.a()
         .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
+
+
+
+// at top: import edu.wpi.first.wpilibj2.command.button.POVButton;
+
+    driverController.povUp()
+        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.CORAL_L2));
+
+    driverController.povUp()
+        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));
   }
 
   /**
