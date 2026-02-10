@@ -121,7 +121,7 @@ public class RobotContainer {
     driverController.povUp()
         .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.CORAL_L2));
 
-    driverController.povUp()
+    driverController.povDown()
         .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));
   }
 
