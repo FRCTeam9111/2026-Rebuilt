@@ -103,7 +103,30 @@ public final class Constants {
   }
 
   public static final class FuelConstants {
-    // Motor controller IDs for Fuel Mechanism motors
+
+       public static final class Feeder {
+    public static final double INTAKE_VOLTS = -12.0;
+    public static final double LAUNCH_VOLTS = 9.0;
+    public static final double SPINUP_VOLTS = -6.0;
+    public static final int MOTOR_ID = 9;
+    public static final int CURRENT_LIMIT = 60;
+  }
+
+  public static final class Intake {
+    public static final double ROLLER_VOLTS = 10.0;
+    // other intake-specific constants
+  }
+
+  public static final class Launcher {
+    public static final double SHOOTER_VOLTS = 10.6;
+    public static final double SPINUP_SECONDS = 1.0;
+    public static final int MOTOR_ID = 10;
+    public static final int CURRENT_LIMIT = 60;
+    // other launcher-specific constants
+  }
+
+    /*
+     * // Motor controller IDs for Fuel Mechanism motors
     public static final int FEEDER_MOTOR_ID = 9;
     public static final int INTAKE_LAUNCHER_MOTOR_ID = 10;
 
@@ -114,12 +137,19 @@ public final class Constants {
     // Voltage values for various fuel operations. These values may need to be tuned
     // based on exact robot construction.
     // See the Software Guide for tuning information
+
+    
     public static final double INTAKING_FEEDER_VOLTAGE = -12;
     public static final double INTAKING_INTAKE_VOLTAGE = 10;
     public static final double LAUNCHING_FEEDER_VOLTAGE = 9;
     public static final double LAUNCHING_LAUNCHER_VOLTAGE = 10.6;
     public static final double SPIN_UP_FEEDER_VOLTAGE = -6;
     public static final double SPIN_UP_SECONDS = 1;
+     * 
+     */
+    
+ 
+
   }
 
 
