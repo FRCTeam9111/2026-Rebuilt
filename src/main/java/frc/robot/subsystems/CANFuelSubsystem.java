@@ -21,11 +21,13 @@ import frc.robot.Constants.FuelConstants.Launcher;
 public class CANFuelSubsystem extends SubsystemBase {
   private final SparkMax feederRoller;
   private final SparkMax intakeLauncherRoller;
+  private final SparkMax topLauncherRoller;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
   // create motors for each of the motors on the launcher mechanism
-  intakeLauncherRoller = new SparkMax(Launcher.MOTOR_ID, MotorType.kBrushless);
+  intakeLauncherRoller = new SparkMax(Launcher.BOTTOM_MOTOR_ID, MotorType.kBrushless);
+  topLauncherRoller = new SparkMax(Launcher.TOP_MOTOR_ID, MotorType.kBrushless);
   feederRoller = new SparkMax(Feeder.MOTOR_ID, MotorType.kBrushless);
 
     // put default values for various fuel operations onto the dashboard
@@ -53,7 +55,14 @@ public class CANFuelSubsystem extends SubsystemBase {
     launcherConfig.inverted(true);
   launcherConfig.smartCurrentLimit(Launcher.CURRENT_LIMIT);
     intakeLauncherRoller.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkMaxConfig topLauncherConfig = new SparkMaxConfig();
+    topLauncherConfig.inverted(true);
+  topLauncherConfig.smartCurrentLimit(Launcher.CURRENT_LIMIT);
+  topLauncherConfig.follow(Launcher.BOTTOM_MOTOR_ID);
+    topLauncherRoller.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
+  
 
   // A method to set the rollers to values for intaking
   public void intake() {
@@ -75,7 +84,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void launch() {
   feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", Feeder.LAUNCH_VOLTS));
   intakeLauncherRoller
-    .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", Launcher.SHOOTER_VOLTS));
+  .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", Launcher.SHOOTER_VOLTS));
   }
 
   // A method to stop the rollers

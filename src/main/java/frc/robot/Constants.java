@@ -120,8 +120,10 @@ public final class Constants {
   public static final class Launcher {
     public static final double SHOOTER_VOLTS = 10.6;
     public static final double SPINUP_SECONDS = 1.0;
-    public static final int MOTOR_ID = 10;
+    public static final int BOTTOM_MOTOR_ID = 10;
     public static final int CURRENT_LIMIT = 60;
+    public static final int TOP_MOTOR_ID = 13;
+
     // other launcher-specific constants
   }
 
