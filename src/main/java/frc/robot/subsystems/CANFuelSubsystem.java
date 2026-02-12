@@ -21,13 +21,13 @@ import frc.robot.Constants.FuelConstants.Launcher;
 public class CANFuelSubsystem extends SubsystemBase {
   private final SparkMax feederRoller;
   private final SparkMax intakeLauncherRoller;
-  private final SparkMax topLauncherRoller;
+  private final SparkMax launcherRoller;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
   // create motors for each of the motors on the launcher mechanism
-  intakeLauncherRoller = new SparkMax(Launcher.BOTTOM_MOTOR_ID, MotorType.kBrushless);
-  topLauncherRoller = new SparkMax(Launcher.TOP_MOTOR_ID, MotorType.kBrushless);
+  intakeLauncherRoller = new SparkMax(Launcher.INTAKE_MOTOR_ID, MotorType.kBrushless);
+  launcherRoller = new SparkMax(Launcher.LAUNCHER_ROLLER_MOTOR_ID, MotorType.kBrushless); // this is the orange roller at the top
   feederRoller = new SparkMax(Feeder.MOTOR_ID, MotorType.kBrushless);
 
     // put default values for various fuel operations onto the dashboard
@@ -59,8 +59,8 @@ public class CANFuelSubsystem extends SubsystemBase {
     SparkMaxConfig topLauncherConfig = new SparkMaxConfig();
     topLauncherConfig.inverted(true);
   topLauncherConfig.smartCurrentLimit(Launcher.CURRENT_LIMIT);
-  topLauncherConfig.follow(Launcher.BOTTOM_MOTOR_ID);
-    topLauncherRoller.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  topLauncherConfig.follow(Launcher.INTAKE_MOTOR_ID);
+    launcherRoller.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
   
 
@@ -84,7 +84,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void launch() {
   feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", Feeder.LAUNCH_VOLTS));
   intakeLauncherRoller
-  .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", Launcher.SHOOTER_VOLTS));
+  .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", Launcher.SHOOTER_VOLTS));
+  launcherRoller.setVoltage(SmartDashboard.getNumber("Launcher roller value", Launcher.SHOOTER_VOLTS));
   }
 
   // A method to stop the rollers
