@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.ElevatorSubsystem;
+//import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.FuelConstants;
@@ -42,7 +42,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+ // private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -106,9 +106,11 @@ public class RobotContainer {
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     driverController.rightBumper()
-        .whileTrue(ballSubsystem.spinUpCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
+    .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.launch(), () -> ballSubsystem.stop()));
+   /*  .whileTrue(ballSubsystem.spinUpCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
             .andThen(ballSubsystem.launchCommand())
-            .finallyDo(() -> ballSubsystem.stop()));
+            .finallyDo(() -> ballSubsystem.stop()));*/
+        
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverController.a()
@@ -118,11 +120,11 @@ public class RobotContainer {
 
 // at top: import edu.wpi.first.wpilibj2.command.button.POVButton;
 
-    driverController.povUp()
+    /*driverController.povUp()
         .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.CORAL_L2));
 
     driverController.povDown()
-        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));
+        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));*/
   }
 
   /**

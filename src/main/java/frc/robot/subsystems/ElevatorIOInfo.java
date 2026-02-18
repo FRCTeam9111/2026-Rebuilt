@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+/*package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
@@ -99,7 +99,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Set follower to follow leader (invert if needed)
         liftFollowerMotor.follow(liftMotor, ElevatorConstants.INVERT_FOLLOWER_OUTPUT); // Use boolean constant
         */
-    }
+  /*   }
     @Logged(name="Elevator: Lift IOInfo")
     private final ElevatorIOInfo ioInfo = new ElevatorIOInfo();
     @Logged
@@ -208,7 +208,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 
              * 
              */
-
+/* 
             // CORRECTED CODE (uses velocity only)
             feedforwardVoltage = liftFFController.calculate(
                 liftPidController.getSetpoint().velocity  // No acceleration needed!
@@ -225,6 +225,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
         return bottomLiftLimitSwitch.get();
     }*/
+    /* 
     public boolean liftAtGoal() {
         return liftPidController.atGoal();
     }
@@ -277,4 +278,4 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     
-}
+}*/

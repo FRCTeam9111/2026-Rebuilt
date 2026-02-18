@@ -77,14 +77,13 @@ public class CANFuelSubsystem extends SubsystemBase {
   feederRoller
     .setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", Feeder.INTAKE_VOLTS));
   intakeLauncherRoller
-    .setVoltage(-1 * SmartDashboard.getNumber("Intaking launcher roller value", Intake.ROLLER_VOLTS));
+    .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", Intake.ROLLER_VOLTS));
   }
 
   // A method to set the rollers to values for launching.
   public void launch() {
-  feederRoller.setVoltage(SmartDashboard.getNumber("Launching feeder roller value", Feeder.LAUNCH_VOLTS));
-  intakeLauncherRoller
-  .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", Launcher.SHOOTER_VOLTS));
+  feederRoller.setVoltage(-1 * SmartDashboard.getNumber("Launching feeder roller value", Feeder.LAUNCH_VOLTS));
+  intakeLauncherRoller.setVoltage(-1 * SmartDashboard.getNumber("Intaking launcher roller value", Launcher.SHOOTER_VOLTS));
   launcherRoller.setVoltage(SmartDashboard.getNumber("Launcher roller value", Launcher.SHOOTER_VOLTS));
   }
 
@@ -92,6 +91,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void stop() {
     feederRoller.set(0);
     intakeLauncherRoller.set(0);
+    launcherRoller.set(0);
+
   }
 
   // A method to spin up the launcher roller while spinning the feeder roller to
@@ -100,7 +101,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   feederRoller
     .setVoltage(SmartDashboard.getNumber("Spin-up feeder roller value", Feeder.SPINUP_VOLTS));
   intakeLauncherRoller
-    .setVoltage(SmartDashboard.getNumber("Launching launcher roller value", Launcher.SHOOTER_VOLTS));
+    .setVoltage(-1 * SmartDashboard.getNumber("Launching launcher roller value", Launcher.SHOOTER_VOLTS));
   }
 
   // A command factory to turn the spinUp method into a command that requires this

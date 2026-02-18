@@ -106,7 +106,7 @@ public final class Constants {
 
        public static final class Feeder {
     public static final double INTAKE_VOLTS = -12.0;
-    public static final double LAUNCH_VOLTS = 9.0;
+    public static final double LAUNCH_VOLTS = 12.0;
     public static final double SPINUP_VOLTS = -6.0;
     public static final int MOTOR_ID = 9;
     public static final int CURRENT_LIMIT = 60;
@@ -118,7 +118,7 @@ public final class Constants {
   }
 
   public static final class Launcher {
-    public static final double SHOOTER_VOLTS = 10.6;
+    public static final double SHOOTER_VOLTS = 12;
     public static final double SPINUP_SECONDS = 1.0;
     public static final int INTAKE_MOTOR_ID = 10;
     public static final int CURRENT_LIMIT = 60;
@@ -156,9 +156,9 @@ public final class Constants {
 
 
   public static final class ElevatorConstants {
-      public static final int ELEVATOR_MOTOR_ID = 7; //TODO
-      public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 8;
-      public static final int ELEVATOR_ARM_MOTOR_ID = 9;
+      public static final int ELEVATOR_MOTOR_ID = 11; //TODO
+      public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 12;
+      public static final int ELEVATOR_ARM_MOTOR_ID = 20;
       public static final int gearing = 12;
       public static final double drumRadiusInMeters = Units.inchesToMeters(1);     // sprocket diameter is 2"
       public static final double drumCircumferenceInMeters = 2.0 * Math.PI * drumRadiusInMeters;
