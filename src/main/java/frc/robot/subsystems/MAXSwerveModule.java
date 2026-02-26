@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -20,6 +23,8 @@ import com.revrobotics.ResetMode;
 import frc.robot.Configs;
 
 public class MAXSwerveModule {
+  Rotation2d gyroAngle = new Rotation2d();
+
   private final SparkMax m_drivingSpark;
   private final SparkMax m_turningSpark;
 
@@ -59,6 +64,19 @@ public class MAXSwerveModule {
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
+
+    /*
+     * private final DifferentialDrivePoseEstimator m_poseEstimator =
+      new DifferentialDrivePoseEstimator(
+          m_kinematics,
+          gyroAngle.getRotation2d(),
+          m_leftEncoder.getDistance(),
+          m_rightEncoder.getDistance(),
+          new Pose2d(),
+          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+     * 
+     */
   }
 
   /**
