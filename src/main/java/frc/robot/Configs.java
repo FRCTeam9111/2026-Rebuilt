@@ -63,8 +63,9 @@ public final class Configs {
         }
     }
 
-        public static final class robotConfig {
-                // Placeholder for PathPlanner RobotConfig. Populate this when you have
-                // the correct ModuleConfig/RobotConfig parameters for your robot.
-        }
+   /*  public static final class robotConfig {
+        ModuleConfig moduleConfig = new ModuleConfig(ModuleConstants.kWheelRadiusMeters, DriveConstants.kMaxSpeedMetersPerSecond, 1.0, ModuleConstants.kDrivingMotorReduction);
+        RobotConfig config = new RobotConfig();
+
+    }*/
 }
