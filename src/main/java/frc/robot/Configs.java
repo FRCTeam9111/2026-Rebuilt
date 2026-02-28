@@ -1,11 +1,14 @@
 package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.DriveConstants;
 
 public final class Configs {
     public static final class MAXSwerveModule {
@@ -59,4 +62,9 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+
+        public static final class robotConfig {
+                // Placeholder for PathPlanner RobotConfig. Populate this when you have
+                // the correct ModuleConfig/RobotConfig parameters for your robot.
+        }
 }
