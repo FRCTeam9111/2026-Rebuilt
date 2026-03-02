@@ -32,6 +32,10 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -54,16 +58,23 @@ public class RobotContainer {
 
     private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
-    // The autonomous chooser
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  // The autonomous chooser
+  private final SendableChooser<Command> autoChooser; // = new SendableChooser<>();
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-public RobotContainer() { 
+public RobotContainer() {   
     // Configure the button bindings
     configureButtonBindings();
 
-    configureAutoChooser();   // add autonomous options
+    // configureAutoChooser();   // add autonomous options
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // Pathplanner events 
+    NamedCommands.registerCommand("Shoot fuel for 3 seconds", ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()).withTimeout(3));
+
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
