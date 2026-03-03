@@ -104,10 +104,19 @@ public class CANFuelSubsystem extends SubsystemBase {
     .setVoltage(-1 * SmartDashboard.getNumber("Launching launcher roller value", Launcher.SHOOTER_VOLTS));
   }
 
+  // A method to spin up only the launcher roller
+  public void spinUpLauncherRollers() {
+    launcherRoller.setVoltage(SmartDashboard.getNumber("Launcher roller value", Launcher.SHOOTER_VOLTS));
+  }
+
   // A command factory to turn the spinUp method into a command that requires this
   // subsystem
   public Command spinUpCommand() {
     return this.run(() -> spinUp());
+  }
+
+  public Command spinUpLauncherRollersCommand() {
+    return this.run(() -> spinUpLauncherRollers());
   }
 
   // A command factory to turn the launch method into a command that requires this
