@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-//import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Autos;
@@ -50,7 +50,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
- // private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+ private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -144,14 +144,13 @@ public RobotContainer() {
         .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
 
 
-
 // at top: import edu.wpi.first.wpilibj2.command.button.POVButton;
 
-    /*driverController.povUp()
-        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.CORAL_L2));
+    driverController.povUp()
+        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.TOWER_LVL_1));
 
     driverController.povDown()
-        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));*/
+        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));
   }
 
   /**

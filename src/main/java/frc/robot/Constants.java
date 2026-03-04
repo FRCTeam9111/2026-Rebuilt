@@ -157,7 +157,7 @@ public final class Constants {
 
 
   public static final class ElevatorConstants {
-      public static final int ELEVATOR_MOTOR_ID = 11; //TODO
+      public static final int ELEVATOR_MOTOR_ID = 11; // TODO
       public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 12;
       public static final int ELEVATOR_ARM_MOTOR_ID = 20;
       public static final int gearing = 12;
@@ -177,10 +177,8 @@ public final class Constants {
       
       public static enum ElevatorPosition {
         BOTTOM(0.0),      // min height will trigger limit switch
-        INTAKE(0.35),     // coral intake
-        CORAL_L1(0.8),
-        CORAL_L2(1.2),
-        TOP(1.5);        // max height
+        TOWER_LVL_1(0.686);     // units in meters
+        
   
         public final double value;
   

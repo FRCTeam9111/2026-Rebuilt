@@ -1,4 +1,4 @@
-/*package frc.robot.subsystems;
+package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
@@ -99,7 +99,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Set follower to follow leader (invert if needed)
         liftFollowerMotor.follow(liftMotor, ElevatorConstants.INVERT_FOLLOWER_OUTPUT); // Use boolean constant
         */
-  /*   }
+    }
     @Logged(name="Elevator: Lift IOInfo")
     private final ElevatorIOInfo ioInfo = new ElevatorIOInfo();
     @Logged
@@ -199,8 +199,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             feedbackVoltage = liftPidController.calculate(getPosition());
             feedforwardVoltage = liftFFController.calculate(liftPidController.getSetpoint().velocity);
            
-
-           
             // Old math.signum function
             /*
              * if (Math.abs(feedbackVoltage) < 1 && feedbackVoltage != 0) {
@@ -208,14 +206,11 @@ public class ElevatorSubsystem extends SubsystemBase {
                 
              * 
              */
-/* 
+
             // CORRECTED CODE (uses velocity only)
             feedforwardVoltage = liftFFController.calculate(
                 liftPidController.getSetpoint().velocity  // No acceleration needed!
             );
-            
-            
-
             setVoltage(feedbackVoltage+feedforwardVoltage);
         }).withName("elevator.moveToCurrentGoal");
     }
@@ -225,7 +220,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
         return bottomLiftLimitSwitch.get();
     }*/
-    /* 
     public boolean liftAtGoal() {
         return liftPidController.atGoal();
     }
@@ -255,17 +249,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         ElevatorPosition liftLevelTarget;
          // TODO add arm position & command to setup arm
          switch (level) {
-            case INTAKE:
-                liftLevelTarget = ElevatorPosition.INTAKE;
-                break;
-            case TOP:
-                liftLevelTarget = ElevatorPosition.TOP;
-                break;
-            case CORAL_L1:
-                liftLevelTarget = ElevatorPosition.CORAL_L1;
-                break;
-            case CORAL_L2:
-                liftLevelTarget = ElevatorPosition.CORAL_L2;
+            case TOWER_LVL_1:
+                liftLevelTarget = ElevatorPosition.TOWER_LVL_1;
                 break;
             default: 
                 liftLevelTarget = ElevatorPosition.BOTTOM;
@@ -278,4 +263,4 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     
-}*/
+}
