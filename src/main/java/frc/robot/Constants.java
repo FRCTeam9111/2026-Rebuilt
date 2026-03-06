@@ -172,7 +172,7 @@ public final class Constants {
 
       public static final int MOTOR_ID = 12;
       public static final boolean MOTOR_INVERTED = false;
-      public static final boolean FOLLOWER_MOTOR_INVERTED = true;
+      public static final boolean FOLLOWER_MOTOR_INVERTED = true;  
       public static final boolean INVERT_FOLLOWER_OUTPUT = false;
       
       public static enum ElevatorPosition {
@@ -202,7 +202,7 @@ public final class Constants {
         public static final double MIN_ANGLE_RADIANS = -Math.PI / 2.0;
         public static final double MAX_ANGLE_RADIANS = Math.PI / 2.0;
 
-        public static final int CURRENT_LIMIT = 4;
+        public static final int CURRENT_LIMIT = 30;  // changed from 4 to 30A
 
         /*
         kS = Static friction (voltage to overcome stiction)

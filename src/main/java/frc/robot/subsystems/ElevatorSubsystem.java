@@ -89,8 +89,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Configure follower motor
         SparkMaxConfig followerConfig = new SparkMaxConfig();
-        followerConfig.inverted(ElevatorConstants.FOLLOWER_MOTOR_INVERTED).idleMode(IdleMode.kBrake);
-        followerConfig.follow(liftMotor, ElevatorConstants.FOLLOWER_MOTOR_INVERTED);
+        //followerConfig.inverted(ElevatorConstants.FOLLOWER_MOTOR_INVERTED).idleMode(IdleMode.kCoast);
+        followerConfig.follow(liftMotor, ElevatorConstants.FOLLOWER_MOTOR_INVERTED).idleMode(IdleMode.kCoast);
         liftFollowerMotor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
          
         /* 
@@ -168,7 +168,18 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic(){
         // note: default command moveToSetPointCommand() automatically runs
         //updateElevatorIOInfo();
-        
+
+        SmartDashboard.putNumber("Elevator/LeaderAppliedOutput", liftMotor.getAppliedOutput()); // percent [-1,1]
+        SmartDashboard.putNumber("Elevator/FollowerAppliedOutput", liftFollowerMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Elevator/LeaderCurrentA", liftMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/FollowerCurrentA", liftFollowerMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/PositionMeters", liftMotor.getEncoder().getPosition());
+
+        SmartDashboard.putNumber("Elevator/pos", getPosition());
+        SmartDashboard.putNumber("Elevator/pidOut", feedbackVoltage);
+        SmartDashboard.putNumber("Elevator/ff", feedforwardVoltage);
+        SmartDashboard.putNumber("Elevator/commandBeforeClamp", feedbackVoltage+feedforwardVoltage);
+        SmartDashboard.putNumber("Elevator/setpointVel", liftPidController.getSetpoint().velocity);
     }
 
     public void setVoltage(double voltage) {
@@ -261,6 +272,4 @@ public class ElevatorSubsystem extends SubsystemBase {
             System.out.println("Running setTargetPositionCommand " + liftLevelTarget);
             return moveToPositionCommand( () -> liftLevelTarget);
     }
-
-    
 }
