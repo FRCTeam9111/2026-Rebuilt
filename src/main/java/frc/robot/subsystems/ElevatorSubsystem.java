@@ -51,7 +51,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private final SparkMax liftMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
     private final SparkMax liftFollowerMotor = new SparkMax(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID, MotorType.kBrushless);
-    private final SparkMax armMotor = new SparkMax(ElevatorConstants.ELEVATOR_ARM_MOTOR_ID, MotorType.kBrushless);
     private SparkMaxConfig liftMotorConfig;
     @Logged(name = "Desired Target")
     private double desiredLiftLevel = 0.0;
@@ -90,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Configure follower motor
         SparkMaxConfig followerConfig = new SparkMaxConfig();
         //followerConfig.inverted(ElevatorConstants.FOLLOWER_MOTOR_INVERTED).idleMode(IdleMode.kCoast);
-        followerConfig.follow(liftMotor, ElevatorConstants.FOLLOWER_MOTOR_INVERTED).idleMode(IdleMode.kCoast);
+        followerConfig.follow(liftMotor, ElevatorConstants.FOLLOWER_MOTOR_INVERTED).idleMode(IdleMode.kBrake);
         liftFollowerMotor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
          
         /* 
