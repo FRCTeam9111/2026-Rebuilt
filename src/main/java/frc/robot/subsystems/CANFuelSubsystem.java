@@ -75,7 +75,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   // the same values as intaking, but in the opposite direction.
   public void eject() {
   feederRoller
-    .setVoltage(-1 * SmartDashboard.getNumber("Intaking feeder roller value", Feeder.INTAKE_VOLTS));
+    .setVoltage( SmartDashboard.getNumber("Intaking feeder roller value", Feeder.INTAKE_VOLTS));
   intakeLauncherRoller
     .setVoltage(SmartDashboard.getNumber("Intaking launcher roller value", Intake.ROLLER_VOLTS));
   }
