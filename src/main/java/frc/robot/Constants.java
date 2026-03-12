@@ -120,7 +120,7 @@ public final class Constants {
 
   public static final class Launcher {
     public static final double SHOOTER_VOLTS = 8.5;
-    public static final double SPINUP_SECONDS = 1.0;
+    public static final double SPINUP_SECONDS = 0.5;
     public static final int INTAKE_MOTOR_ID = 10;
     public static final int CURRENT_LIMIT = 60;
     public static final int LAUNCHER_ROLLER_MOTOR_ID = 13;
@@ -172,12 +172,12 @@ public final class Constants {
 
       public static final int MOTOR_ID = 12;
       public static final boolean MOTOR_INVERTED = false;
-      public static final boolean FOLLOWER_MOTOR_INVERTED = true;  
+      public static final boolean FOLLOWER_MOTOR_INVERTED = false;  // changed from true to false 
       public static final boolean INVERT_FOLLOWER_OUTPUT = false;
       
       public static enum ElevatorPosition {
-        BOTTOM(0.0),      // min height will trigger limit switch
-        TOWER_LVL_1(0.686);     // units in meters
+        BOTTOM(-0.005),      
+        TOWER_LVL_1(-0.686);     // units in meters
         
   
         public final double value;
@@ -212,9 +212,9 @@ public final class Constants {
         
         */
 
-        public static final double kP = 10; // TODO
-        public static final double kI = 0.01; // TODO
-        public static final double kD = 0.01; // TODO
+        public static final double kP = 0; // TODO 10
+        public static final double kI = 0.01; // TODO 0.01
+        public static final double kD = 0.01; // TODO 0.01
         public static final double kS = 0.017964; // TODO
         public static final double kG = 0.321192; // TODO
         public static final double kV = 0.876084;// TODO
