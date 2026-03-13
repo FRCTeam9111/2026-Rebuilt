@@ -47,8 +47,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  
+
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+
+  public DriveSubsystem getDriveSubsystem() { return m_robotDrive; }
 
  // private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 

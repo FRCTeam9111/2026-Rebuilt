@@ -58,6 +58,8 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 4;
     public static final int kRearRightTurningCanId = 3;
 
+    public static final double VISION_TURN_kP = 0.05;
+
     public static final boolean kGyroReversed = false;
   }
 

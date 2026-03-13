@@ -3,10 +3,27 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -15,9 +32,36 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+
+  Pose3d robotPose;
+  boolean launcherSpinCmd;
+
+  public static final AprilTagFieldLayout kTagLayout =
+                AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+  public static final Transform3d kRobotToCam =
+                new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
+
+  PhotonPoseEstimator photonEstimator = new PhotonPoseEstimator(kTagLayout, kRobotToCam);
+
+
+  // Create the driver's controller for the teleop period. 
+  // This is used in the teleopPeriodic method to read driver inputs and control the robo for autoalignment.
+    XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  // 1. Create the camera object
+    PhotonCamera camera = new PhotonCamera("9111camera1");
+
+    // 3. Constants for "Aiming"
+    final double LINEAR_P = 0.1; // Speed to move forward
+    final double ANGULAR_P = 0.05; // Speed to turn
+
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  private final PIDController aimPID = new PIDController(DriveConstants.VISION_TURN_kP, 0, 0);
+
+  public final DriveSubsystem m_swerveDrive = m_robotContainer.getDriveSubsystem(); // may need to put this into robotInit
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -88,7 +132,62 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+      // Calculate drivetrain commands from Joystick values
+        double forward = -m_driverController.getLeftY();   // normalized [-1..1]
+        double strafe  = -m_driverController.getLeftX();   // normalized [-1..1]
+        double rotation = -m_driverController.getRightX(); // normalized [-1..1]
+
+        // Read in relevant data from the Camera
+        boolean targetVisible = false;
+        double targetYaw = 0.0;
+        var results = camera.getAllUnreadResults();
+        if (!results.isEmpty()) {
+            // Camera processed a new frame since last
+            // Get the last one in the list.
+            var result = results.get(results.size() - 1);
+            if (result.hasTargets()) {
+                // At least one AprilTag was seen by the camera
+                for (var target : result.getTargets()) {
+                    if (target.getFiducialId() == 7) {
+                        // Found Tag 7, record its information
+                        targetYaw = target.getYaw();
+                        targetVisible = true;
+                    }
+                }
+            }
+        }
+
+        // Auto-align when requested
+        if (m_driverController.getAButton() && targetVisible) {
+            // Driver wants auto-alignment to tag 7
+            // And, tag 7 is in sight, so we can turn toward it.
+            // Override the driver's turn command with an automatic one that turns toward the tag.
+
+            // aimPID expects radians (or degrees consistently) — pick one and be consistent
+            double targetYawRad = Math.toRadians(targetYaw);
+            // If we treat current yaw as 0 (camera-centered), the controller can compute directly:
+            double rotOut = aimPID.calculate(0.0, targetYawRad); // output in same units as P (radians * K)
+            rotation = MathUtil.clamp(-rotOut, -1.0, 1.0);
+        }
+
+    if (kTagLayout.getTagPose(target.getFiducialId()).isPresent()) {
+      Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(target.getFiducialId()).get(), cameraToRobot);
+    }
+      
+        if(robotPose.X() < 1.5){
+      // Near blue alliance wall, start spinning the launcher wheel
+      launcherSpinCmd = true;
+    } else {
+      // Far away, no need to run launcher.
+      launcherSpinCmd = false;
+    }
+
+      // Use fieldRelative = true if you want joystick inputs field-relative; false for robot-relative.
+      boolean fieldRelative = true;
+      m_swerveDrive.drive(forward, strafe, rotation, fieldRelative);
+  }
 
   @Override
   public void testInit() {
