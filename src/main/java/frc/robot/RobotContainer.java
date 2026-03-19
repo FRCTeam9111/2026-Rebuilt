@@ -4,10 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -15,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -33,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -48,14 +53,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  
+    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-  // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+    public DriveSubsystem getDriveSubsystem() { return m_robotDrive; }
 
-  public DriveSubsystem getDriveSubsystem() { return m_robotDrive; }
-
-  private final VisionSubsystem m_vision = new VisionSubsystem();
+    private final VisionSubsystem m_vision = new VisionSubsystem(m_robotDrive);
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -63,8 +65,38 @@ public class RobotContainer {
 
     private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
+
   // The autonomous chooser
   private final SendableChooser<Command> autoChooser; // = new SendableChooser<>();
+
+    AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField); 
+
+
+  private Pose2d getHubPose() {
+        var alliance = DriverStation.getAlliance();
+        
+        // TODO: Check the 2026 Game Manual for the actual Hub tag IDs!
+        // We'll use 7 for Blue and 4 for Red as an example.
+        int targetTagID = 7; // Default to Blue
+
+        if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+            targetTagID = 4; // Switch to Red!
+        }
+
+        // Ask the map: "Where exactly is this tag?"
+        Optional<Pose3d> tagPose3d = fieldLayout.getTagPose(targetTagID);
+
+        // If the map successfully found the tag, convert its 3D location into a 2D GPS coordinate
+        if (tagPose3d.isPresent()) {
+            return tagPose3d.get().toPose2d();
+        }
+
+        // Failsafe: If the tag doesn't exist in the layout for some reason, return null.
+        // Remember that safety check we put in aimAtTargetCommand (`if (targetPose == null)`)? 
+        // This is exactly why we added it! The robot will just drive normally instead of crashing.
+        return null; 
+    }
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */

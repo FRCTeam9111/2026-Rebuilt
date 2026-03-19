@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -11,7 +14,9 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.VecBuilder;
-
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -55,6 +60,10 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
+  // field layout, contains coordinates to use for aiming
+  private final AprilTagFieldLayout fieldLayout = 
+        AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
   // Odometry class for tracking robot pose
   // The Pose Estimator (Replaces SwerveDriveOdometry)
   private final SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
@@ -75,6 +84,10 @@ public class DriveSubsystem extends SubsystemBase {
       // The camera is accurate long-term, but can be noisy frame-to-frame.
       VecBuilder.fill(0.5, 0.5, Math.toRadians(30)) 
   );
+
+  // 1. Create a PID Controller specifically for aiming. 
+  // You will need to tune the "P" value (currently 5.0) in your Constants later.
+  private final PIDController aimingPID = new PIDController(5.0, 0.0, 0.0);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -114,6 +127,12 @@ public class DriveSubsystem extends SubsystemBase {
             },
             this // Reference to this subsystem to set requirements
     );
+
+    // 2. CRITICAL SAFETY STEP:
+    // Tell the PID controller that a circle wraps around. 
+    // Without this, if your robot crosses the 180-degree mark, it will violently 
+    // spin 360 degrees the long way around to get to -179 degrees.
+    aimingPID.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   @Override
@@ -276,6 +295,8 @@ public class DriveSubsystem extends SubsystemBase {
      return this.run(() -> drive(xSpeed, ySpeed, rot, fieldRelative));
   }
 
+
+
   /**
    * Called by the VisionSubsystem to feed tag data into the Pose Estimator.
    * @param visionRobotPoseMeters The 2D pose calculated by PhotonVision
@@ -284,4 +305,39 @@ public class DriveSubsystem extends SubsystemBase {
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
       m_poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
+
+
+
+  /**
+     * Drives the robot using driver translation inputs, but automatically rotates to face a target on the field.
+     * * @param xSpeed The driver's forward/back joystick input
+     * @param ySpeed The driver's left/right joystick input
+     * @param targetPoseSupplier The field coordinate we want to look at, constantly updated dynamically
+     */
+    public Command aimAtTargetCommand(DoubleSupplier xSpeed, DoubleSupplier ySpeed, Supplier<Pose2d> targetPoseSupplier) {
+        return this.run(() -> {
+            // 1. Where do we want to look? (This dynamically evaluates every 20ms!)
+            Pose2d targetPose = targetPoseSupplier.get();
+            
+            // Safety check: If the target doesn't exist right now, just don't rotate.
+            if (targetPose == null) {
+                this.drive(xSpeed.getAsDouble(), ySpeed.getAsDouble(), 0, true);
+                return;
+            }
+
+            // 2. Where are we currently?
+            Pose2d currentPose = this.getPose();
+
+            // 3. The Math
+            double deltaX = targetPose.getX() - currentPose.getX();
+            double deltaY = targetPose.getY() - currentPose.getY();
+            double targetAngleRad = Math.atan2(deltaY, deltaX);
+
+            double currentAngleRad = currentPose.getRotation().getRadians();
+            double rotationSpeed = aimingPID.calculate(currentAngleRad, targetAngleRad);
+
+            // 4. Drive!
+            this.drive(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rotationSpeed, true);
+        });
+    }
 }
