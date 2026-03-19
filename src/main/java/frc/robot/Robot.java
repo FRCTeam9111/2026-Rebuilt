@@ -5,6 +5,7 @@
 package frc.robot;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.PhotonPoseEstimator;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -34,6 +36,7 @@ import frc.robot.subsystems.DriveSubsystem;
  */
 public class Robot extends TimedRobot {
 
+  
   Pose3d robotPose;
   boolean launcherSpinCmd;
 
@@ -50,7 +53,7 @@ public class Robot extends TimedRobot {
   // This is used in the teleopPeriodic method to read driver inputs and control the robo for autoalignment.
     XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   // 1. Create the camera object
-    PhotonCamera camera = new PhotonCamera("9111camera1");
+    PhotonCamera camera = new PhotonCamera("frontCamera");
 
     // 3. Constants for "Aiming"
     final double LINEAR_P = 0.1; // Speed to move forward
@@ -135,6 +138,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
+        Pose3d robotPose = new Pose3d();
+
       // Calculate drivetrain commands from Joystick values
         double forward = -m_driverController.getLeftY();   // normalized [-1..1]
         double strafe  = -m_driverController.getLeftX();   // normalized [-1..1]
@@ -143,6 +148,8 @@ public class Robot extends TimedRobot {
         // Read in relevant data from the Camera
         boolean targetVisible = false;
         double targetYaw = 0.0;
+        double targetRange = 0.0;
+        
         var results = camera.getAllUnreadResults();
         if (!results.isEmpty()) {
             // Camera processed a new frame since last
@@ -154,6 +161,13 @@ public class Robot extends TimedRobot {
                     if (target.getFiducialId() == 7) {
                         // Found Tag 7, record its information
                         targetYaw = target.getYaw();
+
+                        targetRange =
+                                PhotonUtils.calculateDistanceToTargetMeters(
+                                        0.5, // Measured with a tape measure, or in CAD.
+                                        1.435, // From 2024 game manual for ID 7
+                                        Units.degreesToRadians(-30.0), // Measured with a protractor, or in CAD.
+                                        Units.degreesToRadians(target.getPitch()));
                         targetVisible = true;
                     }
                 }
@@ -171,13 +185,21 @@ public class Robot extends TimedRobot {
             // If we treat current yaw as 0 (camera-centered), the controller can compute directly:
             double rotOut = aimPID.calculate(0.0, targetYawRad); // output in same units as P (radians * K)
             rotation = MathUtil.clamp(-rotOut, -1.0, 1.0);
+
+            double autoSpeed = (VISION_DES_RANGE_m - targetRange) * VISION_STRAFE_kP;
+            forward = (VISION_DES_RANGE_m - targetRange) * VISION_STRAFE_kP * Constants.Swerve.kMaxLinearSpeed;
         }
 
+    PhotonTrackedTarget target = camera.getLatestResult().getBestTarget();
+
+
     if (kTagLayout.getTagPose(target.getFiducialId()).isPresent()) {
-      Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(target.getFiducialId()).get(), cameraToRobot);
+      AprilTagFieldLayout aprilTagFieldLayout;
+            Transform3d cameraToRobot;
+      robotPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(target.getFiducialId()).get(), cameraToRobot);
     }
       
-        if(robotPose.X() < 1.5){
+      if(robotPose.X() < 1.5){
       // Near blue alliance wall, start spinning the launcher wheel
       launcherSpinCmd = true;
     } else {

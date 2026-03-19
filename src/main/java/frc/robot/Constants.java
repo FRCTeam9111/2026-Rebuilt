@@ -157,7 +157,13 @@ public final class Constants {
 
   }
 
+  public static final class VisionConstants {
+    public static final double VISION_DES_RANGE_m = 1.0; // example desired distance from target for auto-alignment, in meters
+    public static final double VISION_STRAFE_kP = 0.05; // example proportional gain for driving forward/backward during auto-alignment, in (output units per meter of error)
+    public static final double VISION_TURN_kP = 0.05; // example proportional gain for turning during auto-alignment, in (output units per degree of error)
+  }
 
+  
   public static final class ElevatorConstants {
       public static final int ELEVATOR_MOTOR_ID = 11; // TODO
       public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 12;

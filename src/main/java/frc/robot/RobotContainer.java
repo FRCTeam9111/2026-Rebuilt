@@ -25,6 +25,7 @@ import frc.robot.commands.Autos;
 import frc.robot.Constants.FuelConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -54,7 +55,7 @@ public class RobotContainer {
 
   public DriveSubsystem getDriveSubsystem() { return m_robotDrive; }
 
- // private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+  private final VisionSubsystem m_vision = new VisionSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -146,6 +147,9 @@ public RobotContainer() {
     // the intake
     driverController.a()
         .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
+
+    driverController.x()
+        .whileTrue(m_vision.autoAlignCommand(m_robotDrive));
 
 
 // at top: import edu.wpi.first.wpilibj2.command.button.POVButton;
