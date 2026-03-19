@@ -194,9 +194,8 @@ public class Robot extends TimedRobot {
 
 
     if (kTagLayout.getTagPose(target.getFiducialId()).isPresent()) {
-      AprilTagFieldLayout aprilTagFieldLayout;
             Transform3d cameraToRobot;
-      robotPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(target.getFiducialId()).get(), cameraToRobot);
+      robotPose = PhotonUtils.estimateFieldToRobotAprilTag(target.getBestCameraToTarget(), kTagLayout.getTagPose(target.getFiducialId()).get(), cameraToRobot);
     }
       
       if(robotPose.X() < 1.5){

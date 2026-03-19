@@ -1,97 +1,95 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
-
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
-
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.Constants.VisionConstants;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.EstimatedRobotPose;
+import java.util.Optional;
 
 public class VisionSubsystem extends SubsystemBase {
     private final PhotonCamera camera = new PhotonCamera("myCamera");
-    
-    // Variables that update in your periodic()
-    private double targetYaw = 0;
-    private double targetRange = 0;
+    private final PhotonPoseEstimator poseEstimator;
+
+    // This is the variable we will update every 20ms
+    private Pose2d latestFieldPose = new Pose2d();
     private boolean hasTarget = false;
 
-   @Override
+    // Add the drivetrain as a variable so the vision system can talk to it
+    private final DriveSubsystem drivetrain;
+
+    public VisionSubsystem(DriveSubsystem drivetrain) {
+        this.drivetrain = drivetrain;
+        // 1. Load the official WPILib Field Map
+        // (WPILib updates this enum every year, e.g., k2024Crescendo, k2025Reefscape, etc.)
+        AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField); 
+
+        // 2. Define where the camera is on your robot
+        // Example: Camera is 10 inches (0.254m) forward, dead center, 20 inches (0.508m) high, tilted back 30 degrees
+        Transform3d robotToCam = new Transform3d(
+                new Translation3d(0.254, 0.0, 0.508), 
+                new Rotation3d(0, Math.toRadians(-30), 0)
+        );
+
+        // 3. Create the Pose Estimator
+        // MULTI_TAG_PNP_ON_COPROCESSOR is the most accurate strategy. 
+        // It uses the Raspberry Pi to calculate the 3D geometry before sending it to Java.
+        poseEstimator = new PhotonPoseEstimator(
+                fieldLayout, 
+                robotToCam
+        );
+    }
+
+    @Override
     public void periodic() {
-        // We use getLatestResult() instead of the unread list, it's cleaner!
-        var result = camera.getLatestResult();
-        
-        if (result.hasTargets()) {
-            boolean foundTargetTag = false;
+        // UPDATED: Grab the latest camera frame first
+        var pipelineResult = camera.getLatestResult();
 
-            // Loop through all tags the camera can currently see
-            for (var target : result.getTargets()) {
-                // Check if it's the specific tag we want (ID 7)
-                if (target.getFiducialId() == 7) {
-                    foundTargetTag = true;
-                    targetYaw = target.getYaw();
-                    
-                    // Do the math to find distance to Tag 7
-                    targetRange = PhotonUtils.calculateDistanceToTargetMeters(
-                            0.5, // Camera height (Measured in CAD)
-                            1.435, // Tag 7 height (From game manual)
-                            Units.degreesToRadians(-30.0), // Camera mount angle
-                            Units.degreesToRadians(target.getPitch()) // Target pitch
-                    );
-                    
-                    // Break out of the loop since we found what we need
-                    break; 
-                }
-            }
+        // Then, feed that frame into the estimator using your preferred strategy.
+        // This runs the heavy multi-tag math!
+        Optional<EstimatedRobotPose> estimatedPose = poseEstimator.estimateCoprocMultiTagPose(pipelineResult);
+
+        if (estimatedPose.isPresent()) {
+            hasTarget = true;
+            latestFieldPose = estimatedPose.get().estimatedPose.toPose2d();
             
-            // Update our global boolean
-            hasTarget = foundTargetTag;
-
+            // Push the data to the drivetrain instantly!
+            drivetrain.addVisionMeasurement(
+                latestFieldPose, 
+                estimatedPose.get().timestampSeconds
+            );
+            
         } else {
             hasTarget = false;
         }
     }
+
+    // --- GETTERS ---
     
-    // Create a "getter" so other parts of your code can ask for the distance
-    public double getTargetRange() {
-        return targetRange;
+    public boolean hasTarget() {
+        return hasTarget;
     }
 
-    /**
-     * COMMAND FACTORY: This creates your auto-align command inline.
-     * We pass in the Drivetrain so this subsystem knows what to drive.
-     */
-    public Command autoAlignCommand(DriveSubsystem drivetrain) {
-        return Commands.run(
-            () -> {
-                // 1. Check if we can see the tag
-                if (this.hasTarget) {
-                    
-                    // 2. Math for driving forward/backward (Clamped!)
-                    double rangeError = VisionConstants.VISION_DES_RANGE_m - this.targetRange;
-                    double forwardSpeed = MathUtil.clamp(rangeError * VisionConstants.VISION_STRAFE_kP, -1.0, 1.0);
-                    
-                    // 3. Math for turning (Clamped!)
-                    // We want yaw to be 0 (centered).
-                    double rotError = 0 - this.targetYaw; 
-                    double turnSpeed = MathUtil.clamp(rotError * VisionConstants.VISION_TURN_kP, -1.0, 1.0);
+    /** Returns your exact X/Y coordinates and rotation on the field */
+    public Pose2d getLatestFieldPose() {
+        return latestFieldPose;
+    }
 
-                    // 4. Send it to the drivetrain
-                    drivetrain.drive(forwardSpeed, 0, turnSpeed, false);
-                } else {
-                    // Stop if we lose the target
-                    drivetrain.drive(0, 0, 0, false);
-                }
-            }, 
-            drivetrain, this // <--- CRITICAL: Tells WPILib this command requires both subsystems
-            
-        ).finallyDo(() -> {
-            // SAFETY: When the command ends (driver lets go of the button), stop the robot.
-            drivetrain.drive(0, 0, 0, false);
-        });
+    /** * Replaces your old math! 
+     * If you want to know how far you are from exactly X=16.0 meters, Y=5.5 meters...
+     */
+    public double getDistanceToHub() {
+        // Example coordinates of the target on the field map
+        Pose2d hubLocation = new Pose2d(16.0, 5.5, new Rotation2d()); 
+        
+        // WPILib calculates the physical distance between your current pose and the target pose
+        return latestFieldPose.getTranslation().getDistance(hubLocation.getTranslation());
     }
 }

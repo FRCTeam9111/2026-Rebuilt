@@ -9,6 +9,9 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.VecBuilder;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -53,7 +56,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+  // The Pose Estimator (Replaces SwerveDriveOdometry)
+  private final SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
       Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
       new SwerveModulePosition[] {
@@ -61,7 +65,16 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      });
+      },
+      new Pose2d(), // Your starting pose (usually 0,0)
+      
+      // Trust Weights: How much we trust the wheels vs the camera
+      // The wheels are very accurate short-term, but drift over time.
+      VecBuilder.fill(0.05, 0.05, Math.toRadians(5)), 
+      
+      // The camera is accurate long-term, but can be noisy frame-to-frame.
+      VecBuilder.fill(0.5, 0.5, Math.toRadians(30)) 
+  );
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -105,8 +118,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(
+    // Update the pose estimator with wheel data in the periodic block
+    m_poseEstimator.update(
         Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
@@ -122,7 +135,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -131,7 +144,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
+    m_poseEstimator.resetPosition(
         Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
@@ -261,5 +274,14 @@ public class DriveSubsystem extends SubsystemBase {
     /* return Commands.run(
        () -> drive(xSpeed, ySpeed, rot, fieldRelative), driveSubsystem);*/
      return this.run(() -> drive(xSpeed, ySpeed, rot, fieldRelative));
+  }
+
+  /**
+   * Called by the VisionSubsystem to feed tag data into the Pose Estimator.
+   * @param visionRobotPoseMeters The 2D pose calculated by PhotonVision
+   * @param timestampSeconds The exact time the camera took the picture
+   */
+  public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+      m_poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
 }

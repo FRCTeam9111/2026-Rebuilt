@@ -64,19 +64,6 @@ public class MAXSwerveModule {
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
-
-    /*
-     * private final DifferentialDrivePoseEstimator m_poseEstimator =
-      new DifferentialDrivePoseEstimator(
-          m_kinematics,
-          gyroAngle.getRotation2d(),
-          m_leftEncoder.getDistance(),
-          m_rightEncoder.getDistance(),
-          new Pose2d(),
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
-     * 
-     */
   }
 
   /**
