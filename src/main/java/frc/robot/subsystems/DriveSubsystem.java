@@ -30,10 +30,14 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -63,6 +67,10 @@ public class DriveSubsystem extends SubsystemBase {
   // field layout, contains coordinates to use for aiming
   private final AprilTagFieldLayout fieldLayout = 
         AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  
+  // field layout meant for the SmartDashboard
+  private final Field2d m_field = new Field2d();
+
 
   // Odometry class for tracking robot pose
   // The Pose Estimator (Replaces SwerveDriveOdometry)
@@ -133,6 +141,11 @@ public class DriveSubsystem extends SubsystemBase {
     // Without this, if your robot crosses the 180-degree mark, it will violently 
     // spin 360 degrees the long way around to get to -179 degrees.
     aimingPID.enableContinuousInput(-Math.PI, Math.PI);
+
+
+    // Do this in either robot or subsystem init
+    SmartDashboard.putData("Field", m_field);
+
   }
 
   @Override
