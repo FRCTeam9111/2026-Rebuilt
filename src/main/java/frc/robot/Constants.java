@@ -119,8 +119,8 @@ public final class Constants {
   }
 
   public static final class Launcher {
-    public static final double SHOOTER_VOLTS = 7.75;
-    public static final double INTAKE_LAUNCHING_VOLTS = 12.0; 
+    public static final double SHOOTER_VOLTS = 8.0; 
+    public static final double INTAKE_LAUNCHING_VOLTS = 12.0; // Front rollers
     public static final double SPINUP_SECONDS = 0.5;
     public static final int INTAKE_MOTOR_ID = 10;
     public static final int CURRENT_LIMIT = 60;

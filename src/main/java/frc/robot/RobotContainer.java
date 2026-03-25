@@ -73,7 +73,9 @@ public RobotContainer() {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // Pathplanner events 
-    NamedCommands.registerCommand("Shoot fuel for 3 seconds", ballSubsystem.runEnd(() -> ballSubsystem.intake(), () -> ballSubsystem.stop()).withTimeout(3));
+    NamedCommands.registerCommand("Shoot fuel for 3 seconds", ballSubsystem.runEnd(() -> ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
+            .andThen(ballSubsystem.launchCommand())
+            .finallyDo(() -> ballSubsystem.stop()), () -> ballSubsystem.stop()).withTimeout(3));
 
 
     // Configure default commands

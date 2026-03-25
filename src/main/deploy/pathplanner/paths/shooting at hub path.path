@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 3.443880171184022,
+        "y": 4.132039942938659
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 4.443880171184022,
+        "y": 4.132039942938659
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 3.443880171184022,
+        "y": 4.132039942938659
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 2.443880171184022,
+        "y": 4.132039942938659
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Shoot",
-      "waypointRelativePos": 0.5702754036087276,
+      "name": "Shoot fuel for 3 seconds",
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
