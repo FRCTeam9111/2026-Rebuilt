@@ -48,7 +48,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private static final DriveSubsystem m_robotDrive = new DriveSubsystem();
+
+  
 
  // private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -64,6 +66,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
 public RobotContainer() {   
+    
     // Configure the button bindings
     configureButtonBindings();
 
@@ -166,4 +169,9 @@ public RobotContainer() {
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();   
   }
+
+  // return the drive subsystem for use in autos and other commands
+  public static DriveSubsystem getDriveSubsystem() {
+    return m_robotDrive;
+}
 }
