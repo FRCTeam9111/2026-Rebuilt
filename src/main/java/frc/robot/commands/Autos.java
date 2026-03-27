@@ -18,14 +18,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.DriveSubsystem; 
 
 public final class Autos {
-  
-  private final static DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public static final DriveSubsystem m_robotDrive = RobotContainer.getDriveSubsystem();
 
   // Example autonomous command which drives forward for 1 second.
   public static final Command exampleAuto(DriveSubsystem driveSubsystem, CANFuelSubsystem ballSubsystem) {
