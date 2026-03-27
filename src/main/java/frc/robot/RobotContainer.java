@@ -50,36 +50,36 @@ public class RobotContainer {
   // The robot's subsystems
   private static final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-  
-
- // private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+  // private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-    private final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
+  private final CANFuelSubsystem ballSubsystem = new CANFuelSubsystem();
 
-    private final CommandXboxController driverController = new CommandXboxController(
+  private final CommandXboxController driverController = new CommandXboxController(
       OIConstants.kDriverControllerPort);
   // The autonomous chooser
   private final SendableChooser<Command> autoChooser; // = new SendableChooser<>();
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-public RobotContainer() {   
-    
+  public RobotContainer() {
+
     // Configure the button bindings
     configureButtonBindings();
-
-    // configureAutoChooser();   // add autonomous options
     autoChooser = AutoBuilder.buildAutoChooser();
+    configureAutoChooser(); // add autonomous options
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // Pathplanner events 
-    NamedCommands.registerCommand("Shoot fuel for 3 seconds", ballSubsystem.runEnd(() -> ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
-            .andThen(ballSubsystem.launchCommand())
-            .finallyDo(() -> ballSubsystem.stop()), () -> ballSubsystem.stop()).withTimeout(3));
-
+    // Pathplanner events
+    NamedCommands.registerCommand("Shoot fuel for 3 seconds",
+        ballSubsystem.runEnd(
+            () -> ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
+                .andThen(ballSubsystem.launchCommand())
+                .finallyDo(() -> ballSubsystem.stop()),
+            () -> ballSubsystem.stop()).withTimeout(3));
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -107,9 +107,9 @@ public RobotContainer() {
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
-    autoChooser.setDefaultOption("Example Auto", Autos.exampleAuto(m_robotDrive, ballSubsystem));
+    autoChooser.setDefaultOption("Launch Auto", Autos.launchAuto(m_robotDrive, ballSubsystem));
     autoChooser.addOption("Trajectory Example Auto)", Autos.exampleTrajectoryAuto(m_robotDrive, ballSubsystem));
-    }
+  }
 
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, Button.kR2.value)
@@ -122,14 +122,15 @@ public RobotContainer() {
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
 
-    /*Using CommandXboxController, the above code can be rewritten as:
+    /*
+     * Using CommandXboxController, the above code can be rewritten as:
      * 
      * While the right trigger on the operator controller is held, drive in an X
      * driverController.rightTrigger()
-        .whileTrue(m_robotDrive.run((() -> m_robotDrive.setX())));
-
-        driverController.start()
-        .whileTrue(m_robotDrive.runOnce((() -> m_robotDrive.zeroHeading())));
+     * .whileTrue(m_robotDrive.run((() -> m_robotDrive.setX())));
+     * 
+     * driverController.start()
+     * .whileTrue(m_robotDrive.runOnce((() -> m_robotDrive.zeroHeading())));
      */
 
     // While the left bumper on operator controller is held, intake Fuel
@@ -138,27 +139,28 @@ public RobotContainer() {
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     driverController.rightBumper()
-    // .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.launch(), () -> ballSubsystem.stop()));  // code that runs 
-    .whileTrue(ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
+        // .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.launch(), () ->
+        // ballSubsystem.stop())); // code that runs
+        .whileTrue(ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
             .andThen(ballSubsystem.launchCommand())
             .finallyDo(() -> ballSubsystem.stop()));
-        
+
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverController.a()
         .whileTrue(ballSubsystem.runEnd(() -> ballSubsystem.eject(), () -> ballSubsystem.stop()));
 
-
-// at top: import edu.wpi.first.wpilibj2.command.button.POVButton;
-    /*driverController.povUp()
-        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.TOWER_LVL_1));
-
-    driverController.povDown()
-        .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));
+    // at top: import edu.wpi.first.wpilibj2.command.button.POVButton;
+    /*
+     * driverController.povUp()
+     * .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.TOWER_LVL_1));
+     * 
+     * driverController.povDown()
+     * .onTrue(elevator.setTargetPositionCommand(ElevatorPosition.BOTTOM));
      * 
      * 
      */
-    
+
   }
 
   /**
@@ -167,11 +169,11 @@ public RobotContainer() {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();   
+    return autoChooser.getSelected();
   }
 
   // return the drive subsystem for use in autos and other commands
   public static DriveSubsystem getDriveSubsystem() {
     return m_robotDrive;
-}
+  }
 }

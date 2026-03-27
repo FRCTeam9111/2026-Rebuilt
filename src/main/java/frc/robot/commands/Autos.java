@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.FuelConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.DriveSubsystem; 
@@ -28,7 +29,7 @@ public final class Autos {
   public static final DriveSubsystem m_robotDrive = RobotContainer.getDriveSubsystem();
 
   // Example autonomous command which drives forward for 1 second.
-  public static final Command exampleAuto(DriveSubsystem driveSubsystem, CANFuelSubsystem ballSubsystem) {
+  public static final Command launchAuto(DriveSubsystem driveSubsystem, CANFuelSubsystem ballSubsystem) {
     
     /*
      * return new SequentialCommandGroup(
@@ -50,15 +51,20 @@ public final class Autos {
     
       return new SequentialCommandGroup(
       // Drive forward for 0.25s using the provided driveSubsystem
-      driveSubsystem.driveForward(driveSubsystem, 0.5, 0, 0, true).withTimeout(0.25),
+      driveSubsystem.driveForward(driveSubsystem, 0.5, 0, 0, true).withTimeout(.25),
       // Stop
-      driveSubsystem.driveForward(driveSubsystem, 0.0, 0, 0, true),
-      // Spin up + launch
-      ballSubsystem.spinUpCommand().withTimeout(1),
+      driveSubsystem.driveForward(driveSubsystem, 0.0, 0, 0, true).withTimeout(.25),
+      /*ballSubsystem.runEnd(() -> ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
+            .andThen(ballSubsystem.launchCommand())
+            .finallyDo(() -> ballSubsystem.stop()), () -> ballSubsystem.stop()).withTimeout(3))*/
+      
+       // Spin up + launch
+      ballSubsystem.spinUpLauncherRollersCommand().withTimeout(1),
       ballSubsystem.launchCommand().withTimeout(9),
       // Stop launcher
-      ballSubsystem.runOnce(ballSubsystem::stop)
-    );
+      ballSubsystem.runOnce(ballSubsystem::stop))
+      
+    ;
 
     
      /* return Commands.run(
