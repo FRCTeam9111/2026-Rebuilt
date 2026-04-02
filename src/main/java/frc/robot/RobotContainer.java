@@ -66,6 +66,20 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
+    // Pathplanner events
+    NamedCommands.registerCommand("Spinup Command",
+        ballSubsystem.spinUpLauncherRollersCommand().withTimeout(1));
+        
+    NamedCommands.registerCommand("Shoot fuel for 3 seconds",
+        /*ballSubsystem.runEnd(
+            () -> ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
+                .andThen(ballSubsystem.launchCommand())
+                .finallyDo(() -> ballSubsystem.stop()),
+            () -> ballSubsystem.stop()).withTimeout(3));*/
+             //ballSubsystem.spinUpLauncherRollersCommand().withTimeout(1),
+      ballSubsystem.launchCommand().withTimeout(5));
+      //ballSubsystem.runOnce(ballSubsystem::stop));
+
     // Configure the button bindings
     configureButtonBindings();
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -73,13 +87,7 @@ public class RobotContainer {
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // Pathplanner events
-    NamedCommands.registerCommand("Shoot fuel for 3 seconds",
-        ballSubsystem.runEnd(
-            () -> ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
-                .andThen(ballSubsystem.launchCommand())
-                .finallyDo(() -> ballSubsystem.stop()),
-            () -> ballSubsystem.stop()).withTimeout(3));
+    
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(

@@ -51,7 +51,7 @@ public final class Autos {
     
       return new SequentialCommandGroup(
       // Drive forward for 0.25s using the provided driveSubsystem
-      driveSubsystem.driveForward(driveSubsystem, 0.5, 0, 0, true).withTimeout(.25),
+      driveSubsystem.driveForward(driveSubsystem, 0.5, 0, 0, true).withTimeout(.35),
       // Stop
       driveSubsystem.driveForward(driveSubsystem, 0.0, 0, 0, true).withTimeout(.25),
       /*ballSubsystem.runEnd(() -> ballSubsystem.spinUpLauncherRollersCommand().withTimeout(FuelConstants.Launcher.SPINUP_SECONDS)
@@ -60,7 +60,7 @@ public final class Autos {
       
        // Spin up + launch
       ballSubsystem.spinUpLauncherRollersCommand().withTimeout(1),
-      ballSubsystem.launchCommand().withTimeout(9),
+      ballSubsystem.launchCommand().withTimeout(5),
       // Stop launcher
       ballSubsystem.runOnce(ballSubsystem::stop))
       

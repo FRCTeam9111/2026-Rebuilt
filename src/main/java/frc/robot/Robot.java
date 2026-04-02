@@ -7,6 +7,7 @@ package frc.robot;
 import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -24,7 +25,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private PhotonCamera camera = new PhotonCamera("photonvision-OUTPUT");
+  private PhotonCamera camera = new PhotonCamera("front_camera");
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -36,9 +37,16 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
-    PortForwarder.add(5800, "10.91.11.11" , 5800);
+    HttpCamera hv = new HttpCamera("PhotonVision", "http://10.91.11.11:5800/?action=stream");
+    CameraServer.startAutomaticCapture(hv);
 
-    Shuffleboard.getTab("Drive").addCamera("Front Cam", "photonvision-OUTPUT", "mpeg:http://10.91.11.11/?action=stream").withWidget("Camera Stream");
+    PortForwarder.add(5800, "10.91.11.11" , 5800);
+    PortForwarder.add(1181, "photonvision.local", 1181);
+
+    // Shuffleboard.getTab("Drive").addCamera("front_camera", "photonvision-OUTPUT", "mpeg:http://10.91.11.11/?action=stream").withWidget("Camera Stream");
+
+    Shuffleboard.getTab("Drive").addCamera("front_camera", "photonvision-OUTPUT", "http://10.91.11.11:1182/stream.mjpg").withWidget("Camera Stream");
+
   }
 
   /**

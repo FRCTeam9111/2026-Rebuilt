@@ -9,6 +9,18 @@
           "data": {
             "pathName": "shooting at hub path"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Spinup Command"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot fuel for 3 seconds"
+          }
         }
       ]
     }
