@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private PhotonCamera camera = new PhotonCamera("front_camera");
+  private PhotonCamera camera = new PhotonCamera("photonvision-OUTPUT");
 
   /**
    * This function is run when the robot is first started up and should be used for any
